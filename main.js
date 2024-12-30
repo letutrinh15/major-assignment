@@ -1,37 +1,26 @@
 const readline = require("readline");
-
-
-
-
 class ParkingLot {
     constructor() {
         this.vehicles = [];
         this.totalRevenue = 0;
     }
-
-
-
-
     in(time, plate) {
         // Kiểm tra định dạng thời gian
         if (!this.isValidTime(time)) {
             console.log(0); // Thời gian không hợp lệ
             return;
         }
-   
         // Kiểm tra định dạng biển số xe
         if (!this.isValidPlate(plate)) {
             console.log(0); // Biển số xe không hợp lệ
             return;
         }
-   
         // Kiểm tra xem xe đã có trong bãi chưa
         const exists = this.vehicles.some(vehicle => vehicle.plate === plate);
         if (exists) {
             console.log(0); // Xe đã tồn tại
             return;
         }
-   
         // Thêm xe vào danh sách
         this.vehicles.push({ plate, time_in: time });
         console.log(1); // Thêm thành công
@@ -42,10 +31,6 @@ class ParkingLot {
             console.log(0); // Thời gian không hợp lệ
             return;
         }
-
-
-
-
         const index = this.vehicles.findIndex(vehicle => vehicle.plate === plate);
         if (index === -1) {
             console.log(0); // Xe không có trong bãi
@@ -57,69 +42,41 @@ class ParkingLot {
         this.vehicles.splice(index, 1); // Loại bỏ xe khỏi danh sách
         console.log(1); // Thành công
     }
-
-
-
-
     // Tìm xe
     find(plate) {
         const index = this.vehicles.findIndex(vehicle => vehicle.plate === plate);
         console.log(index !== -1 ? index + 1 : -1); // Trả về chỉ số hoặc -1
     }
-
-
-
-
     // Đếm xe đạp
     countBicycles() {
         const count = this.vehicles.filter(vehicle => this.isBicycle(vehicle.plate)).length;
         console.log(count);
     }
-
-
-
-
     // Đếm xe máy
     countMotorcycles() {
         const count = this.vehicles.filter(vehicle => !this.isBicycle(vehicle.plate)).length;
         console.log(count);
     }
-
-
-
-
     // Danh sách xe trong bãi
     list() {
         if (this.vehicles.length === 0) {
             console.log("Bãi xe hiện tại trống.");
             return;
         }
-
-
-
-
         this.vehicles.forEach(vehicle => {
             console.log(`${vehicle.time_in} ${vehicle.plate}`); // Hiển thị thời gian và biển số
         });
     }
-
-
-
-
     calculatePrice(checkInTime, checkOutTime, plate) {
         const isBicycle = /^xxxx-\d{3}\.\d{2}$/.test(plate);
         const rates = isBicycle
             ? { day: 1, night: 2, dayNight: 3, fullCycle: 5 }
             : { day: 3, night: 5, dayNight: 8, fullCycle: 13 };
-   
         const checkIn = new Date(`2024-12-23T${checkInTime}`);
         const checkOut = new Date(`2025-01-01T${checkOutTime}`);
-   
         const isDayTime = hour => hour >= 6 && hour < 18;
-   
         const checkInHour = checkIn.getHours();
         const checkOutHour = checkOut.getHours();
-   
         if (isDayTime(checkInHour) && isDayTime(checkOutHour)) {
             return rates.day;
         }
@@ -128,41 +85,30 @@ class ParkingLot {
         }
         return rates.dayNight;
     }
-   
     bill(time, plate) {
         const vehicle = this.vehicles.find(v => v.plate === plate);
         if (!vehicle) {
             console.log(-1);
             return -1;
         }
-   
         const checkInTime = vehicle.time_in;
         const totalPrice = this.calculatePrice(checkInTime, time, plate);
         return totalPrice;
     }
-   
     billall() {
         console.log(this.totalRevenue);
     }
-
-
     // Kiểm tra định dạng thời gian
     isValidTime(time) {
         const regex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
         return regex.test(time);
     }
-
-
-
-
     // Kiểm tra định dạng biển số xe
     isValidPlate(plate) {
         // Regex kiểm tra xe đạp
         const bicycleRegex = /^xxxx-\d{3}\.\d{2}$/;
-   
         // Regex kiểm tra xe máy
         const motorcycleRegex = /^\d{2}[A-Za-z]\d-\d{3}\.\d{2}$/;
-   
         // Biển số hợp lệ là 1 trong 2 loại trên
         return bicycleRegex.test(plate) || motorcycleRegex.test(plate);
     }
@@ -171,53 +117,25 @@ class ParkingLot {
         return plate.startsWith("xxxx");
     }
 }
-
-
-
-
 // Khởi tạo ParkingLot
 const parkingLot = new ParkingLot();
-
-
-
-
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
 });
-
-
-
-
 let isReadingVehicles = true;
-
-
-
-
 rl.on("line", (line) => {
     line = line.trim();
-
-
-
-
     // Kết thúc chương trình
     if (line === "***") {
         rl.close();
         return;
     }
-
-
-
-
     // Chuyển từ khối xe khởi tạo sang khối lệnh
     if (line === "*") {
         isReadingVehicles = false;
         return;
     }
-
-
-
-
     if (isReadingVehicles) {
         // Đọc danh sách xe ban đầu
         const [time, plate] = line.split(" ");
@@ -227,10 +145,6 @@ rl.on("line", (line) => {
     } else {
         // Xử lý các câu lệnh
         const [action, ...params] = line.split(" ");
-
-
-
-
         switch (action) {
             case "list":
                 parkingLot.list();
@@ -261,4 +175,3 @@ rl.on("line", (line) => {
         }
     }
 });
-
